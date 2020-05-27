@@ -1,5 +1,6 @@
 package com.leonardobufalo.tour.controller
 
+import com.leonardobufalo.tour.exception.PromocaoNotFoundException
 import com.leonardobufalo.tour.model.Promocao
 import com.leonardobufalo.tour.service.PromocaoService
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,20 +37,26 @@ class PromocaoController {
     }
 
     @DeleteMapping(value = ["/{id}"])
-    fun delete(@PathVariable id: Long): ResponseEntity<Promocao?> {
+    fun delete(@PathVariable id: Long): ResponseEntity<Map<String, String>> {
         val promocao: Promocao? = promocaoService.delete(id)
         val status = if(promocao == null) HttpStatus.NOT_FOUND else HttpStatus.OK
-        return ResponseEntity(promocao, status)
+        val ResponseMessage = mapOf<String, String>("message" to "Ok", "status" to "deleted")
+        return ResponseEntity(ResponseMessage, status)
     }
 
     @PutMapping()
     fun update(@RequestBody promocao: Promocao): ResponseEntity<Promocao?> {
-        val promocaoDeleted: ResponseEntity<Promocao?> = delete(promocao.id)
-        val promocaoCreated: ResponseEntity<Promocao?> = create(promocao)
-        val status =
-                if(promocaoDeleted.statusCode == HttpStatus.OK && promocaoCreated.statusCode == HttpStatus.CREATED) HttpStatus.OK
-                    else HttpStatus.NOT_MODIFIED
-        return ResponseEntity(promocaoCreated.body, status)
+
+        val promocaoUpdated: Promocao?
+        var status = HttpStatus.NOT_MODIFIED
+
+        if (promocaoService.getById(promocao.id) != null) {
+            promocaoUpdated = promocaoService.update(promocao)
+            status = if(promocaoUpdated != null) HttpStatus.OK else HttpStatus.NOT_FOUND
+            return ResponseEntity(promocaoUpdated, status)
+        }
+
+        return ResponseEntity(promocao, status)
     }
 
 }
