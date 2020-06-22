@@ -4,6 +4,7 @@ import com.leonardobufalo.tour.exception.PromocaoNotFoundException
 import com.leonardobufalo.tour.model.Promocao
 import com.leonardobufalo.tour.service.PromocaoService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -23,9 +24,12 @@ class PromocaoController {
     }
 
     @GetMapping()
-    fun getAll(@RequestParam(required = false, defaultValue = "") localFilter: String): ResponseEntity<List<Promocao>> {
-        val promocoes = promocaoService.getAll(localFilter)
-        val status = if(promocoes == null) HttpStatus.NOT_FOUND else HttpStatus.OK
+    fun getAll(
+            @RequestParam(required = false, defaultValue = "") localFilter: String,
+            @RequestParam(required = false, defaultValue = "0") page: Int,
+            @RequestParam(required = false, defaultValue = "3") size: Int ): ResponseEntity<Page<Promocao?>> {
+        val promocoes: Page<Promocao?> = promocaoService.getAll(localFilter, page, size)
+        val status = if(promocoes.size == 0) HttpStatus.NOT_FOUND else HttpStatus.OK
         return ResponseEntity(promocoes, status)
     }
 
@@ -38,8 +42,8 @@ class PromocaoController {
 
     @DeleteMapping(value = ["/{id}"])
     fun delete(@PathVariable id: Long): ResponseEntity<Map<String, String>> {
-        val promocao: Promocao? = promocaoService.delete(id)
-        val status = if(promocao == null) HttpStatus.NOT_FOUND else HttpStatus.OK
+        promocaoService.delete(id)
+        val status = HttpStatus.OK
         val ResponseMessage = mapOf<String, String>("message" to "Ok", "status" to "deleted")
         return ResponseEntity(ResponseMessage, status)
     }
@@ -57,6 +61,27 @@ class PromocaoController {
         }
 
         return ResponseEntity(promocao, status)
+    }
+
+    @GetMapping(value = ["/sortedByLocal"])
+    fun getAllSorted(): ResponseEntity<List<Promocao?>> {
+        val AllPromotionSortedByLocal = promocaoService.getAllSortedByLocal()
+        val status = if(AllPromotionSortedByLocal.size == 0) HttpStatus.NOT_FOUND else HttpStatus.OK
+        return ResponseEntity(AllPromotionSortedByLocal, status)
+    }
+
+    @GetMapping(value = ["/findByPreco"])
+    fun getByPreco(@RequestParam(required = true) preco: Double): ResponseEntity<List<Promocao?>>{
+        val promotions : List<Promocao?> = promocaoService.getByPreco(preco)
+        val status = if(promotions.size >= 0) HttpStatus.NOT_FOUND else HttpStatus.OK
+        return ResponseEntity(promotions, status)
+    }
+
+    @PutMapping(value = ["/updateByLocal"])
+    fun updateByLocal(@RequestBody local: String, @RequestBody preco: Double): ResponseEntity<List<Promocao?>> {
+        val updatedPromocoes : List<Promocao?> =  promocaoService.updateByLocal(local, preco)
+        val status: HttpStatus = if(updatedPromocoes.size >= 0) HttpStatus.NOT_MODIFIED else HttpStatus.OK
+        return ResponseEntity(updatedPromocoes, status)
     }
 
 }

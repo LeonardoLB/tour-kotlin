@@ -5,7 +5,7 @@ spring:
     password: root
     username: root
   jpa:
-    showSql: true
+    showSql: false
     hibernate:
-      ddlAuto: create-drop
+      ddlAuto: none
     generateDdl: true
