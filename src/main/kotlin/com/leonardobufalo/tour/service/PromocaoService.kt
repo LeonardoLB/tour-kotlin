@@ -20,6 +20,6 @@ interface PromocaoService {
 
     fun getByPreco(preco: Double): List<Promocao?>
 
-    fun updateByLocal(local: String, preco: Double): List<Promocao?>
+    fun updateByLocal(local: String, preco: Double): Int
 
 }

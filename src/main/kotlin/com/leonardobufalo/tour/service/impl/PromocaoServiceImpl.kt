@@ -54,7 +54,7 @@ class PromocaoServiceImpl: PromocaoService {
         return promocaoRepository.findByPreco(preco)
     }
 
-    override fun updateByLocal(local: String, preco: Double): List<Promocao?> {
+    override fun updateByLocal(local: String, preco: Double): Int {
         return promocaoRepository.updateByLocal(local, preco)
     }
 

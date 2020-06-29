@@ -22,5 +22,5 @@ interface PromocaoRepository: PagingAndSortingRepository<Promocao, Long> {
 
     @Query(value = "update promocao p set p.preco = :preco where p.local = :local", nativeQuery = true)
     @Transactional @Modifying
-    fun updateByLocal(@Param(value = "local") local: String, @Param(value = "preco") preco: Double): List<Promocao?>
+    fun updateByLocal(@Param(value = "local") local: String, @Param(value = "preco") preco: Double): Int
 }

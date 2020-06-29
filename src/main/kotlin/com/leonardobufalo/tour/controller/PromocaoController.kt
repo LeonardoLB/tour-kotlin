@@ -78,9 +78,9 @@ class PromocaoController {
     }
 
     @PutMapping(value = ["/updateByLocal"])
-    fun updateByLocal(@RequestBody local: String, @RequestBody preco: Double): ResponseEntity<List<Promocao?>> {
-        val updatedPromocoes : List<Promocao?> =  promocaoService.updateByLocal(local, preco)
-        val status: HttpStatus = if(updatedPromocoes.size >= 0) HttpStatus.NOT_MODIFIED else HttpStatus.OK
+    fun updateByLocal(@RequestParam local: String, @RequestParam preco: Double): ResponseEntity<Int> {
+        val updatedPromocoes : Int =  promocaoService.updateByLocal(local, preco)
+        val status: HttpStatus = if(updatedPromocoes > 0) HttpStatus.OK else HttpStatus.NOT_MODIFIED
         return ResponseEntity(updatedPromocoes, status)
     }
 
